@@ -34,3 +34,7 @@ def get_movies_list(list_type="popular"):
     response.raise_for_status()
     return response.json()
 
+def get_movie_images(movie_id):
+    endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}/images?api_key={API_TOKEN}"
+    response = requests.get(endpoint)
+    return response.json()

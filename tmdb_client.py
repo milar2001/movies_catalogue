@@ -14,10 +14,16 @@ def get_movies(list_type="popular", how_many=0):
     data = get_popular_movies(list_type)
     return data["results"][:how_many]
 
+
 def get_single_movie(movie_id):
     endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_TOKEN}"
     response = requests.get(endpoint)
-    return response.json()
+    data = response.json()
+
+    if 'title' not in data:
+        raise KeyError("Invalid response format: missing 'title' field")
+
+    return data
 
 def get_single_movie_cast(movie_id):
     endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}/credits?api_key={API_TOKEN}"

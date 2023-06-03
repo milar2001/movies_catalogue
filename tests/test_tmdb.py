@@ -1,3 +1,5 @@
+import pytest
+
 import tmdb_client
 from unittest.mock import Mock
 
@@ -13,6 +15,7 @@ def test_get_single_movie(monkeypatch):
 
    assert movie['id'] == movie_id
    assert movie['title'] == 'John Wick: Chapter 4'
+   mock_get.assert_called_once_with(f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_client.API_TOKEN}")
 
 
 def test_get_movie_images(monkeypatch):
@@ -44,3 +47,13 @@ def test_get_single_movie_cast(monkeypatch):
    cast = tmdb_client.get_single_movie_cast(movie_id)
 
    assert cast['cast'][0]['name'] == 'Keanu Reeves'
+
+def test_get_single_movie_invalid_data(monkeypatch):
+   movie_id = 603692
+   mock_response = {'id': movie_id, 'name': 'John Wick: Chapter 4'}  # Zmienione pole 'title' na 'name'
+
+   mock_get = Mock(return_value=Mock(json=Mock(return_value=mock_response)))
+   monkeypatch.setattr("requests.get", mock_get)
+
+   with pytest.raises(KeyError, match="Invalid response format: missing 'title' field"):
+       tmdb_client.get_single_movie(movie_id)

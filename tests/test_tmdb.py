@@ -1,7 +1,7 @@
 import pytest
-
 import tmdb_client
 from unittest.mock import Mock
+from main import app
 
 
 def test_get_single_movie(monkeypatch):
@@ -57,3 +57,16 @@ def test_get_single_movie_invalid_data(monkeypatch):
 
    with pytest.raises(KeyError, match="Invalid response format: missing 'title' field"):
        tmdb_client.get_single_movie(movie_id)
+
+
+@pytest.mark.parametrize("list_type", ["popular", "top_rated", "now_playing", "upcoming"])
+def test_homepage(monkeypatch, list_type):
+    api_mock = Mock(return_value={'results': []})
+    monkeypatch.setattr("tmdb_client.get_popular_movies", api_mock)
+
+    with app.test_client() as client:
+        response = client.get(f'/?list_type={list_type}')
+        assert response.status_code == 200
+        api_mock.assert_called_once_with(list_type)
+
+

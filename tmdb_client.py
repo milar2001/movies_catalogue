@@ -44,3 +44,12 @@ def get_movie_images(movie_id):
     endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}/images?api_key={API_TOKEN}"
     response = requests.get(endpoint)
     return response.json()
+
+def search(search_query):
+    endpoint = f"https://api.themoviedb.org/3/search/movie?query={search_query}&api_key={API_TOKEN}"
+    response = requests.get(endpoint)
+    data = response.json()
+    if 'results' not in data:
+        return []
+    movies = data['results']
+    return movies
